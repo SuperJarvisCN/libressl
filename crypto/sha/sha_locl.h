@@ -56,6 +56,7 @@
  * [including the GNU Public Licence.]
  */
 
+#include <malloc.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -84,6 +85,42 @@
 # define Xupdate(a,ix,ia,ib,ic,id)	( (a)=(ia^ib^ic^id),	\
 					  ix=(a)=ROTATE((a),1)	\
 					)
+
+#ifdef IPP_CP
+#include "ippcp.h"
+int pSize;
+IppsHashState_rmf *pCtx;
+IppsHashMethod *pMethod;
+unsigned char sha1resultint[21];
+SHA1_Init(SHA_CTX *c) {
+  ippsHashGetSize_rmf(&pSize);
+  pCtx = _aligned_malloc(pSize, 4096);
+  ippsHashMethodGetSize(&pSize);
+  pMethod = _aligned_malloc(pSize, 4096);
+  ippsHashMethodSet_SHA1_TT(pMethod);
+  ippsHashInit_rmf(pCtx, ippsHashMethod_SHA1_TT());
+}
+int SHA1_Update(SHA_CTX *c, const void *data, size_t len) {
+  ippsHashUpdate_rmf((const Ipp8u *)data, len, pCtx);
+}
+int SHA1_Final(unsigned char *md, SHA_CTX *c) {
+  ippsHashFinal_rmf((Ipp8u *)md, pCtx);
+  _aligned_free(pCtx);
+  _aligned_free(pMethod);
+}
+unsigned char *SHA1(const unsigned char *d, size_t n, unsigned char *md) {
+  if (md != NULL) {
+    ippsSHA1MessageDigest((const Ipp8u *)d, n, (Ipp8u *)md);
+    return md;
+  } else {
+    ippsSHA1MessageDigest((const Ipp8u *)d, n, (Ipp8u *)sha1resultint);
+    sha1resultint[20] = "\0";
+    return sha1resultint;
+  }
+}
+// void SHA1_Transform(SHA_CTX *c, const unsigned char *data) {}
+
+#else
 
 __BEGIN_HIDDEN_DECLS
 
@@ -414,6 +451,8 @@ static void HASH_BLOCK_DATA_ORDER (SHA_CTX *c, const void *p, size_t num)
 
 		}
 	}
+#endif
+
 #endif
 
 #endif
