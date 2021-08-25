@@ -28,19 +28,38 @@
 static int
 sm3_init(EVP_MD_CTX *ctx)
 {
-	return SM3_Init(ctx->md_data);
+#ifdef IPP_CP
+  int pSize;
+  ippsHashGetSize_rmf(&pSize);
+  ctx->ippCtx = calloc(1, pSize);
+  ippsHashInit_rmf(ctx->ippCtx, ippsHashMethod_SM3());
+  return 1;
+#else
+  return SM3_Init(ctx->md_data);
+#endif
 }
 
 static int
 sm3_update(EVP_MD_CTX *ctx, const void *data, size_t count)
 {
-	return SM3_Update(ctx->md_data, data, count);
+#ifdef IPP_CP
+  ippsHashUpdate_rmf((const Ipp8u *)data, count, ctx->ippCtx);
+  return 1;
+#else
+  return SM3_Update(ctx->md_data, data, count);
+#endif
 }
 
 static int
 sm3_final(EVP_MD_CTX *ctx, unsigned char *md)
 {
-	return SM3_Final(md, ctx->md_data);
+#ifdef IPP_CP
+  ippsHashFinal_rmf((Ipp8u *)md, ctx->ippCtx);
+  free(ctx->ippCtx);
+  return 1;
+#else
+  return SM3_Final(md, ctx->md_data);
+#endif
 }
 
 static const EVP_MD sm3_md = {

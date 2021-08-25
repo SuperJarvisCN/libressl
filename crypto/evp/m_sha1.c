@@ -70,22 +70,47 @@
 #include <openssl/rsa.h>
 #endif
 
+//#ifdef IPP_CP
+//#include "ippcp.h"
+// static int pSize;
+// static IppsHashState_rmf *pCtx;
+//#endif
+
 static int
 init(EVP_MD_CTX *ctx)
 {
-	return SHA1_Init(ctx->md_data);
+#ifdef IPP_CP
+  int pSize;
+  ippsHashGetSize_rmf(&pSize);
+  ctx->ippCtx = calloc(1, pSize);
+  ippsHashInit_rmf(ctx->ippCtx, ippsHashMethod_SHA1_TT());
+  return 1;
+#else
+  return SHA1_Init(ctx->md_data);
+#endif
 }
 
 static int
 update(EVP_MD_CTX *ctx, const void *data, size_t count)
 {
-	return SHA1_Update(ctx->md_data, data, count);
+#ifdef IPP_CP
+  ippsHashUpdate_rmf((const Ipp8u *)data, count, ctx->ippCtx);
+  return 1;
+#else
+  return SHA1_Update(ctx->md_data, data, count);
+#endif
 }
 
 static int
 final(EVP_MD_CTX *ctx, unsigned char *md)
 {
-	return SHA1_Final(md, ctx->md_data);
+#ifdef IPP_CP
+  ippsHashFinal_rmf((Ipp8u *)md, ctx->ippCtx);
+  free(ctx->ippCtx);
+  return 1;
+#else
+  return SHA1_Final(md, ctx->md_data);
+#endif
 }
 
 static const EVP_MD sha1_md = {
@@ -120,13 +145,29 @@ EVP_sha1(void)
 static int
 init224(EVP_MD_CTX *ctx)
 {
-	return SHA224_Init(ctx->md_data);
+#ifdef IPP_CP
+  int pSize;
+  ippsHashGetSize_rmf(&pSize);
+  ctx->ippCtx = calloc(1, pSize);
+  ippsHashInit_rmf(ctx->ippCtx, ippsHashMethod_SHA224_TT());
+  return 1;
+#else
+  return SHA224_Init(ctx->md_data);
+#endif
 }
 
 static int
 init256(EVP_MD_CTX *ctx)
 {
-	return SHA256_Init(ctx->md_data);
+#ifdef IPP_CP
+  int pSize;
+  ippsHashGetSize_rmf(&pSize);
+  ctx->ippCtx = calloc(1, pSize);
+  ippsHashInit_rmf(ctx->ippCtx, ippsHashMethod_SHA256_TT());
+  return 1;
+#else
+  return SHA256_Init(ctx->md_data);
+#endif
 }
 /*
  * Even though there're separate SHA224_[Update|Final], we call
@@ -136,13 +177,24 @@ init256(EVP_MD_CTX *ctx)
 static int
 update256(EVP_MD_CTX *ctx, const void *data, size_t count)
 {
-	return SHA256_Update(ctx->md_data, data, count);
+#ifdef IPP_CP
+  ippsHashUpdate_rmf((const Ipp8u *)data, count, ctx->ippCtx);
+  return 1;
+#else
+  return SHA256_Update(ctx->md_data, data, count);
+#endif
 }
 
 static int
 final256(EVP_MD_CTX *ctx, unsigned char *md)
 {
-	return SHA256_Final(md, ctx->md_data);
+#ifdef IPP_CP
+  ippsHashFinal_rmf((Ipp8u *)md, ctx->ippCtx);
+  free(ctx->ippCtx);
+  return 1;
+#else
+  return SHA256_Final(md, ctx->md_data);
+#endif
 }
 
 static const EVP_MD sha224_md = {
@@ -204,25 +256,52 @@ EVP_sha256(void)
 static int
 init384(EVP_MD_CTX *ctx)
 {
-	return SHA384_Init(ctx->md_data);
+#ifdef IPP_CP
+  int pSize;
+  ippsHashGetSize_rmf(&pSize);
+  ctx->ippCtx = calloc(1, pSize);
+  ippsHashInit_rmf(ctx->ippCtx, ippsHashMethod_SHA384());
+  return 1;
+#else
+  return SHA384_Init(ctx->md_data);
+#endif
 }
 
 static int
 init512(EVP_MD_CTX *ctx)
 {
-	return SHA512_Init(ctx->md_data);
+#ifdef IPP_CP
+  int pSize;
+  ippsHashGetSize_rmf(&pSize);
+  ctx->ippCtx = calloc(1, pSize);
+  ippsHashInit_rmf(ctx->ippCtx, ippsHashMethod_SHA512());
+  return 1;
+#else
+  return SHA512_Init(ctx->md_data);
+#endif
 }
 /* See comment in SHA224/256 section */
 static int
 update512(EVP_MD_CTX *ctx, const void *data, size_t count)
 {
-	return SHA512_Update(ctx->md_data, data, count);
+#ifdef IPP_CP
+  ippsHashUpdate_rmf((const Ipp8u *)data, count, ctx->ippCtx);
+  return 1;
+#else
+  return SHA512_Update(ctx->md_data, data, count);
+#endif
 }
 
 static int
 final512(EVP_MD_CTX *ctx, unsigned char *md)
 {
-	return SHA512_Final(md, ctx->md_data);
+#ifdef IPP_CP
+  ippsHashFinal_rmf((Ipp8u *)md, ctx->ippCtx);
+  free(ctx->ippCtx);
+  return 1;
+#else
+  return SHA512_Final(md, ctx->md_data);
+#endif
 }
 
 static const EVP_MD sha384_md = {

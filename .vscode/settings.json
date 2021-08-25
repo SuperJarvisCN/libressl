@@ -1,0 +1,6 @@
+{
+    "cmake.configureOnOpen": false,
+    "files.associations": {
+        "x86_arch.h": "c"
+    }
+}

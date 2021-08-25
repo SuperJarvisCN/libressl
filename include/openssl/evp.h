@@ -115,6 +115,10 @@
 #define EVP_PKEY_GOSTR12_256 NID_id_tc26_gost3410_2012_256
 #define EVP_PKEY_GOSTR12_512 NID_id_tc26_gost3410_2012_512
 
+#ifdef IPP_CP
+#include "ippcp.h"
+#endif
+
 #ifdef	__cplusplus
 extern "C" {
 #endif
@@ -267,6 +271,9 @@ struct env_md_ctx_st {
 	EVP_PKEY_CTX *pctx;
 	/* Update function: usually copied from EVP_MD */
 	int (*update)(EVP_MD_CTX *ctx, const void *data, size_t count);
+#ifdef IPP_CP
+        IppsHashState_rmf *ippCtx;
+#endif
 } /* EVP_MD_CTX */;
 
 /* values for EVP_MD_CTX flags */
@@ -428,6 +435,9 @@ struct evp_cipher_ctx_st {
 	int final_used;
 	int block_mask;
 	unsigned char final[EVP_MAX_BLOCK_LENGTH];/* possible final block */
+#ifdef IPP_CP
+        IppsAESSpec *ippCtx;
+#endif
 } /* EVP_CIPHER_CTX */;
 
 typedef struct evp_Encode_Ctx_st {
