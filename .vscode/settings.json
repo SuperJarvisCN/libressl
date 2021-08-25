@@ -1,6 +1,11 @@
 {
-    "cmake.configureOnOpen": false,
     "files.associations": {
-        "x86_arch.h": "c"
+        "opensslconf.h": "c",
+        "crypto.h": "c",
+        "opensslv.h": "c",
+        "sha_locl.h": "c",
+        "sha.h": "c",
+        "md32_common.h": "c",
+        "evp.h": "c"
     }
 }
