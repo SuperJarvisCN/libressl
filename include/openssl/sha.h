@@ -98,22 +98,13 @@ typedef struct SHAstate_st
 	} SHA_CTX;
 
 #ifndef OPENSSL_NO_SHA1
-#ifdef IPP_CP
-        int SHA1_Init(SHA_CTX *c);
-        int SHA1_Update(SHA_CTX *c, const void *data, size_t len);
-        int SHA1_Final(unsigned char *md, SHA_CTX *c);
-        unsigned char *SHA1(const unsigned char *d, size_t n,
-                            unsigned char *md);
-        void SHA1_Transform(SHA_CTX *c, const unsigned char *data);
-#else
-        int SHA1_Init(SHA_CTX *c);
-        int SHA1_Update(SHA_CTX *c, const void *data, size_t len)
-            __attribute__((__bounded__(__buffer__, 2, 3)));
-        int SHA1_Final(unsigned char *md, SHA_CTX *c);
-        unsigned char *SHA1(const unsigned char *d, size_t n, unsigned char *md)
-            __attribute__((__bounded__(__buffer__, 1, 2)));
-        void SHA1_Transform(SHA_CTX *c, const unsigned char *data);
-#endif
+int SHA1_Init(SHA_CTX *c);
+int SHA1_Update(SHA_CTX *c, const void *data, size_t len)
+	__attribute__ ((__bounded__(__buffer__,2,3)));
+int SHA1_Final(unsigned char *md, SHA_CTX *c);
+unsigned char *SHA1(const unsigned char *d, size_t n, unsigned char *md)
+	__attribute__ ((__bounded__(__buffer__,1,2)));
+void SHA1_Transform(SHA_CTX *c, const unsigned char *data);
 #endif
 
 #define SHA256_CBLOCK	(SHA_LBLOCK*4)	/* SHA-256 treats input data as a
